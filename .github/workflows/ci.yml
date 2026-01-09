@@ -1,0 +1,67 @@
+# === .github/workflows/ci.yml ===
+
+name: CI & Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Run Tests & Build
+    runs-on: ubuntu-latest
+    
+    # Service containers to run with this job
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_DB: test_db
+        ports:
+          - 5432:5432
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      - name: Run Database Migrations for Test
+        run: npx prisma db push --skip-generate
+        env:
+          DATABASE_URL: postgres://test_user:test_password@localhost:5432/test_db
+
+      - name: Run Tests (with Coverage)
+        run: npm run test:ci
+        env:
+          DATABASE_URL: postgres://test_user:test_password@localhost:5432/test_db
+          NEXT_PUBLIC_APP_URL: http://localhost:3000
+          STRIPE_SECRET_KEY: 'sk_test_mock'
+          STRIPE_WEBHOOK_SECRET: 'whsec_mock'
+
+      - name: Build Project
+        run: npm run build
+        env:
+          DATABASE_URL: postgres://test_user:test_password@localhost:5432/test_db
+          # Dummy values for build phase env vars if needed
+          STRIPE_SECRET_KEY: 'sk_test_mock'

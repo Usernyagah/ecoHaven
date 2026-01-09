@@ -1,0 +1,14 @@
+# Database
+DATABASE_URL="postgresql://eco_user:eco_password@localhost:5432/ecohaven"
+
+# Stripe
+STRIPE_SECRET_KEY="sk_test_mock"
+STRIPE_WEBHOOK_SECRET="whsec_mock"
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY="pk_test_mock"
+
+# Uploadthing
+UPLOADTHING_SECRET="sk_live_mock"
+UPLOADTHING_APP_ID="mock_id"
+
+# App
+NEXT_PUBLIC_APP_URL="http://localhost:3000"

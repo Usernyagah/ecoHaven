@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
       // Create session
       const session = await lucia.createSession(user.id, {})
       const sessionCookie = lucia.createSessionCookie(session.id)
-      ;(await cookies()).set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes)
+        ; (await cookies()).set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes)
 
       return NextResponse.json({
         success: true,
@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
       // Create session
       const session = await lucia.createSession(user.id, {})
       const sessionCookie = lucia.createSessionCookie(session.id)
-      ;(await cookies()).set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes)
+        ; (await cookies()).set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes)
 
       return NextResponse.json({
         success: true,
@@ -124,7 +124,7 @@ export async function POST(request: NextRequest) {
 
       await lucia.invalidateSession(sessionId)
       const sessionCookie = lucia.createBlankSessionCookie()
-      ;(await cookies()).set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes)
+        ; (await cookies()).set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes)
 
       return NextResponse.json({ success: true })
     }
@@ -148,4 +148,3 @@ export async function POST(request: NextRequest) {
     )
   }
 }
-

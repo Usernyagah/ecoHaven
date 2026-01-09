@@ -23,7 +23,7 @@ export async function AuthNav() {
 
   return (
     <nav className="flex items-center gap-4">
-      <span className="text-sm text-muted-foreground">
+      <span className="text-sm text-muted-foreground hidden sm:block">
         {user.name || user.email}
       </span>
       {user.role === 'ADMIN' && (
@@ -39,4 +39,3 @@ export async function AuthNav() {
     </nav>
   )
 }
-

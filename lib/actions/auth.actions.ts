@@ -60,7 +60,7 @@ export async function loginAction(formData: FormData): Promise<AuthResult> {
     // Create session
     const session = await lucia.createSession(user.id, {})
     const sessionCookie = lucia.createSessionCookie(session.id)
-    ;(await cookies()).set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes)
+      ; (await cookies()).set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes)
 
     // Redirect to home or intended page
     redirect('/')
@@ -127,7 +127,7 @@ export async function registerAction(formData: FormData): Promise<AuthResult> {
     // Create session
     const session = await lucia.createSession(user.id, {})
     const sessionCookie = lucia.createSessionCookie(session.id)
-    ;(await cookies()).set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes)
+      ; (await cookies()).set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes)
 
     // Redirect to home
     redirect('/')
@@ -161,8 +161,7 @@ export async function logoutAction(): Promise<void> {
   }
 
   const sessionCookie = lucia.createBlankSessionCookie()
-  ;(await cookies()).set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes)
+    ; (await cookies()).set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes)
 
   redirect('/login')
 }
-
