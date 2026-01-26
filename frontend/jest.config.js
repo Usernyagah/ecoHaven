@@ -17,7 +17,7 @@ const customJestConfig = {
         '**/tests/**/*.(test|spec).(ts|tsx)',
         '**/__tests__/**/*.(test|spec).(ts|tsx)',
     ],
-    testPathIgnorePatterns: ['/node_modules/', '/.next/'],
+    testPathIgnorePatterns: ['/node_modules/', '/.next/', '/tests/e2e/'],
     collectCoverageFrom: [
         'app/**/*.{ts,tsx}',
         'lib/**/*.{ts,tsx}',
@@ -27,6 +27,9 @@ const customJestConfig = {
         '!lib/db.ts',
     ],
     // transform is handled by next/jest
+    transformIgnorePatterns: [
+        '/node_modules/(?!(lucia|oslo|@lucia-auth)/)',
+    ],
 }
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async

@@ -54,7 +54,7 @@ export function Navbar({ authNav }: { authNav?: React.ReactNode }) {
               {authNav}
             </div>
 
-            <Link href="/cart" className="p-2 hover:bg-secondary rounded-lg transition text-foreground">
+            <Link href="/cart" role="button" className="p-2 hover:bg-secondary rounded-lg transition text-foreground">
               <ShoppingCart className="w-5 h-5" />
             </Link>
 

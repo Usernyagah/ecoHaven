@@ -33,10 +33,12 @@ describe("Navbar Component", () => {
     expect(cartButtons.length).toBeGreaterThan(0)
   })
 
-  it("renders theme toggle button", () => {
+  it("renders theme toggle button", async () => {
     render(<Navbar />)
-    const buttons = screen.getAllByRole("button")
-    expect(buttons.length).toBeGreaterThan(2) // Cart, theme toggle, mobile menu
+    await waitFor(() => {
+      const buttons = screen.getAllByRole("button")
+      expect(buttons.length).toBeGreaterThan(2) // Cart, theme toggle, mobile menu
+    })
   })
 
   it("toggles mobile menu when button is clicked", async () => {

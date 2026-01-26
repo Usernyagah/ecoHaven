@@ -653,9 +653,9 @@ describe('Database Constraints', () => {
 
       const session = await prisma.session.create({
         data: {
+          id: `test-session-${Date.now()}`,
           userId: user.id,
           expiresAt: new Date(Date.now() + 86400000), // 1 day from now
-          token: `test-token-${Date.now()}`,
         },
       })
 

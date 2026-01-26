@@ -11,6 +11,16 @@ if (typeof global.TextDecoder === 'undefined') {
     global.TextDecoder = TextDecoder as any
 }
 
+// Polyfill Web APIs
+import 'isomorphic-fetch'
+
+if (typeof global.Request === 'undefined') {
+    const { Request, Response, Headers } = require('isomorphic-fetch')
+    global.Request = Request
+    global.Response = Response
+    global.Headers = Headers
+}
+
 // Global mocks
 global.fetch = jest.fn(() =>
     Promise.resolve({
