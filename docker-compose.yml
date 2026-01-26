@@ -1,5 +1,29 @@
 version: '3.8'
+
 services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: ecohaven_frontend
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://eco_user:eco_password@postgres:5432/ecohaven
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ecohaven_backend
+    ports:
+      - "3001:3001"
+    depends_on:
+      - postgres
+
   postgres:
     image: postgres:16-alpine
     container_name: ecohaven_db
@@ -12,7 +36,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U eco_user -d ecohaven"]
+      test: [ "CMD-SHELL", "pg_isready -U eco_user -d ecohaven" ]
       interval: 5s
       timeout: 5s
       retries: 5
