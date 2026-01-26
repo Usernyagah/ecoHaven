@@ -15,64 +15,20 @@ export async function authMiddleware(request: NextRequest) {
   const isAdminRoute = pathname.startsWith('/admin')
   const isPublicRoute = ['/login', '/register'].includes(pathname)
 
-  // Allow public routes if not authenticated
-  if (isPublicRoute && !sessionId) {
-    return NextResponse.next()
+  // In Middleware (Edge), we can't hit the DB to validate the session.
+  // We perform light redirects based on cookie presence.
+  // Full role-based validation must happen in the Server Components (Node.js).
+
+  // Redirect authenticated users away from login/register
+  if (isPublicRoute && sessionId) {
+    return NextResponse.redirect(new URL('/', request.url))
   }
 
-  // For protected routes (admin) or authenticated users visiting public routes
-  if (isAdminRoute || (isPublicRoute && sessionId)) {
-    if (!sessionId) {
-      // Redirect unauthenticated users to login
-      const redirectUrl = new URL('/login', request.url)
-      redirectUrl.searchParams.set('from', pathname)
-      return NextResponse.redirect(redirectUrl)
-    }
-
-    try {
-      const { user, session } = await lucia.validateSession(sessionId)
-
-      // If session is invalid, redirect to login
-      if (!session || !user) {
-        const redirectUrl = new URL('/login', request.url)
-        redirectUrl.searchParams.set('from', pathname)
-        const response = NextResponse.redirect(redirectUrl)
-        response.cookies.set(lucia.sessionCookieName, '', {
-          expires: new Date(0),
-          path: '/',
-        })
-        return response
-      }
-
-      // Check admin access for admin routes
-      if (isAdminRoute && user.role !== 'ADMIN') {
-        // Redirect non-admin users to home
-        return NextResponse.redirect(new URL('/', request.url))
-      }
-
-      // Redirect authenticated users away from login/register
-      if (isPublicRoute && session && user) {
-        return NextResponse.redirect(new URL('/', request.url))
-      }
-
-      // Create new session cookie if session was refreshed
-      if (session.fresh) {
-        const sessionCookie = lucia.createSessionCookie(session.id)
-        const response = NextResponse.next()
-        response.cookies.set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes)
-        return response
-      }
-    } catch (error) {
-      // If validation fails, redirect to login
-      const redirectUrl = new URL('/login', request.url)
-      redirectUrl.searchParams.set('from', pathname)
-      const response = NextResponse.redirect(redirectUrl)
-      response.cookies.set(lucia.sessionCookieName, '', {
-        expires: new Date(0),
-        path: '/',
-      })
-      return response
-    }
+  // Redirect unauthenticated users away from admin
+  if (isAdminRoute && !sessionId) {
+    const redirectUrl = new URL('/login', request.url)
+    redirectUrl.searchParams.set('from', pathname)
+    return NextResponse.redirect(redirectUrl)
   }
 
   return NextResponse.next()

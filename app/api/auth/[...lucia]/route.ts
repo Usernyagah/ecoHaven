@@ -3,7 +3,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { lucia } from '@/lib/auth/lucia'
 import { db } from '@/lib/db'
-import { hashPassword, verifyPassword } from '@/lib/auth/lucia'
+import { hashPassword, verifyPassword } from '@/lib/auth/password'
 import { cookies } from 'next/headers'
 import { z } from 'zod'
 

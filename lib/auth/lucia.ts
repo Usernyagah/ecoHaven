@@ -3,7 +3,6 @@
 import { Lucia } from 'lucia'
 import { PrismaAdapter } from '@lucia-auth/adapter-prisma'
 import { db } from '@/lib/db'
-import { hash, verify } from '@node-rs/argon2'
 import { cookies } from 'next/headers'
 import { cache } from 'react'
 import type { Session, User } from 'lucia'
@@ -21,8 +20,10 @@ declare module 'lucia' {
   }
 }
 
-// Initialize Prisma adapter for Lucia
-const adapter = new PrismaAdapter(db.session, db.user)
+// Initialize Prisma adapter for Lucia (only in Node.js)
+const adapter = process.env.NEXT_RUNTIME !== 'edge'
+  ? new PrismaAdapter(db.session, db.user)
+  : (null as any)
 
 // Initialize Lucia with configuration
 export const lucia = new Lucia(adapter, {
@@ -58,11 +59,11 @@ export const getUser = cache(async (): Promise<{ user: User; session: Session } 
   try {
     if (result.session && result.session.fresh) {
       const sessionCookie = lucia.createSessionCookie(result.session.id)
-      ;(await cookies()).set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes)
+        ; (await cookies()).set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes)
     }
     if (!result.session) {
       const sessionCookie = lucia.createBlankSessionCookie()
-      ;(await cookies()).set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes)
+        ; (await cookies()).set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes)
     }
   } catch {
     // Next.js throws error when attempting to set cookies during rendering
@@ -70,25 +71,3 @@ export const getUser = cache(async (): Promise<{ user: User; session: Session } 
   return result
 })
 
-// Password hashing utilities using Argon2
-export async function hashPassword(password: string): Promise<string> {
-  return await hash(password, {
-    memoryCost: 19456,
-    timeCost: 2,
-    outputLen: 32,
-    parallelism: 1,
-  })
-}
-
-export async function verifyPassword(hashedPassword: string, password: string): Promise<boolean> {
-  try {
-    return await verify(hashedPassword, password, {
-      memoryCost: 19456,
-      timeCost: 2,
-      outputLen: 32,
-      parallelism: 1,
-    })
-  } catch {
-    return false
-  }
-}

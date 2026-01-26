@@ -3,7 +3,8 @@
 'use server'
 
 import { db } from '@/lib/db'
-import { hashPassword, verifyPassword, lucia } from '@/lib/auth/lucia'
+import { lucia } from '@/lib/auth/lucia'
+import { hashPassword, verifyPassword } from '@/lib/auth/password'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { z } from 'zod'
