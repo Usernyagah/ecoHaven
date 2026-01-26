@@ -1,99 +1,31 @@
-"use client"
-
-import { Leaf } from "lucide-react"
+import { Leaf, ShoppingCart } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { Navbar } from "@/components/navbar"
+import { db } from "@/lib/db"
+import { ProductCard } from "@/components/ui/ProductCard"
 
-interface Product {
-  id: number
-  name: string
-  price: string
-  image: string
-  description: string
-  height: "short" | "medium" | "tall"
-  rotation: number
-}
+export const dynamic = "force-dynamic"
 
-const products: Product[] = [
-  {
-    id: 1,
-    name: "Bamboo Toothbrush Set",
-    price: "$12.99",
-    image: "/bamboo-toothbrush-eco-friendly.png",
-    description: "Sustainable bamboo toothbrushes with biodegradable handles",
-    height: "tall",
-    rotation: -2,
-  },
-  {
-    id: 2,
-    name: "Organic Cotton Tote",
-    price: "$24.99",
-    image: "/organic-cotton-tote-bag-natural.jpg",
-    description: "Durable organic cotton shopping bag",
-    height: "tall",
-    rotation: 1,
-  },
-  {
-    id: 3,
-    name: "Natural Soap Bars",
-    price: "$8.99",
-    image: "/natural-soap-bars-organic.jpg",
-    description: "Handmade with essential oils and natural ingredients",
-    height: "medium",
-    rotation: -1,
-  },
-  {
-    id: 4,
-    name: "Reusable Water Bottle",
-    price: "$34.99",
-    image: "/reusable-stainless-steel-water-bottle-eco.jpg",
-    description: "Stainless steel, keeps drinks hot or cold",
-    height: "medium",
-    rotation: 2,
-  },
-  {
-    id: 5,
-    name: "Plant-Based Candle",
-    price: "$16.99",
-    image: "/natural-soy-candle-plants-botanical.jpg",
-    description: "Made from sustainable soy wax",
-    height: "short",
-    rotation: -1,
-  },
-  {
-    id: 6,
-    name: "Eco Bamboo Utensils",
-    price: "$14.99",
-    image: "/bamboo-utensils-spoon-fork-knife-eco.jpg",
-    description: "Portable travel-friendly utensil set",
-    height: "short",
-    rotation: 1,
-  },
-  {
-    id: 7,
-    name: "Linen Bed Sheets",
-    price: "$89.99",
-    image: "/natural-linen-bedding-sheets-organic.jpg",
-    description: "Luxurious sustainable linen in natural cream",
-    height: "tall",
-    rotation: 0,
-  },
-  {
-    id: 8,
-    name: "Bamboo Cutting Board",
-    price: "$22.99",
-    image: "/bamboo-cutting-board-kitchen-natural.jpg",
-    description: "Renewable bamboo kitchen essential",
-    height: "medium",
-    rotation: -2,
-  },
-]
+export default async function HomePage() {
+  const rawProducts = await db.product.findMany({
+    where: { isFeatured: true },
+    take: 8,
+    orderBy: { createdAt: 'desc' },
+    include: { category: true }
+  });
 
-export default function HomePage() {
+  const featuredProducts = rawProducts.map((p: any, i: number) => ({
+    id: p.id,
+    name: p.name,
+    price: p.priceInCents / 100,
+    image: p.images[0] || "/placeholder.svg",
+    description: p.description,
+    category: p.category.name,
+    height: (["tall", "medium", "short"][i % 3] as "tall" | "medium" | "short"),
+    rotation: ((i % 3) - 1) * 2,
+  }));
+
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
 
       {/* Hero Section - Asymmetrical */}
       <section id="home" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
@@ -159,46 +91,25 @@ export default function HomePage() {
 
         {/* Masonry Grid Layout */}
         <div className="columns-1 sm:columns-2 lg:columns-4 gap-6 space-y-6">
-          {products.map((product) => {
-            const heightMap = {
+          {featuredProducts.map((product: any) => {
+            const heightMap: Record<string, string> = {
               short: "h-[320px]",
               medium: "h-[400px]",
               tall: "h-[480px]",
             }
 
             return (
-              <div
+              <ProductCard
                 key={product.id}
-                className="break-inside-avoid"
-                style={{
-                  transform: `rotate(${product.rotation}deg)`,
-                }}
-              >
-                <Card className="overflow-hidden border-4 border-white shadow-lg hover:shadow-xl transition-shadow duration-300 bg-card">
-                  <div className={`${heightMap[product.height]} overflow-hidden bg-secondary`}>
-                    <img
-                      src={product.image || "/placeholder.svg"}
-                      alt={product.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-
-                  {/* Polaroid-style content */}
-                  <div className="p-4 bg-card space-y-3">
-                    <div>
-                      <h3 className="text-sm font-serif font-semibold text-foreground line-clamp-2">{product.name}</h3>
-                      <p className="text-xs text-muted-foreground mt-1">{product.description}</p>
-                    </div>
-
-                    <div className="flex items-center justify-between pt-2 border-t border-border">
-                      <span className="text-lg font-bold text-primary">{product.price}</span>
-                      <Button size="sm" className="bg-primary hover:bg-primary/90 text-white text-xs">
-                        Add
-                      </Button>
-                    </div>
-                  </div>
-                </Card>
-              </div>
+                id={product.id}
+                name={product.name}
+                price={product.price}
+                image={product.image}
+                category={product.category}
+                description={product.description}
+                height={heightMap[product.height]}
+                rotation={product.rotation}
+              />
             )
           })}
         </div>
