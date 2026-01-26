@@ -264,7 +264,40 @@ npm run lint
 npm run build
 ```
 
+## E2E Testing (Playwright)
+
+This project uses Playwright for end-to-end testing, ensuring that critical user flows work across the entire stack.
+
+### Running E2E Tests
+
+```bash
+# Install browsers (first time only)
+npx playwright install chromium
+
+# Run tests
+npm run test:e2e
+
+# Run tests in UI mode
+npx playwright test --ui
+```
+
+### E2E Test Structure
+
+Tests are located in `tests/e2e/`:
+- `home.spec.ts`: Homepage and basic navigation
+- `cart.spec.ts`: Shopping cart functionality
+
+### CI Integration
+
+E2E tests are automatically run in GitHub Actions. The workflow:
+1. Sets up the environment (PostgreSQL, Node.js)
+2. Seeds the database
+3. Builds the project
+4. Installs Playwright browsers
+5. Executes the E2E test suite
+
 ## Resources
+
 
 - [Jest Documentation](https://jestjs.io/)
 - [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/)
