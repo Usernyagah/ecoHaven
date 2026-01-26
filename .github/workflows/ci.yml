@@ -41,17 +41,21 @@ jobs:
           cache: 'npm'
 
       - name: Install Dependencies
+        working-directory: ./frontend
         run: npm ci
 
       - name: Generate Prisma Client
+        working-directory: ./frontend
         run: npx prisma generate
 
       - name: Run Database Migrations for Test
+        working-directory: ./frontend
         run: npx prisma db push --skip-generate
         env:
           DATABASE_URL: postgres://test_user:test_password@localhost:5432/test_db
 
       - name: Run Tests (with Coverage)
+        working-directory: ./frontend
         run: npm run test:ci
         env:
           DATABASE_URL: postgres://test_user:test_password@localhost:5432/test_db
@@ -60,8 +64,8 @@ jobs:
           STRIPE_WEBHOOK_SECRET: 'whsec_mock'
 
       - name: Build Project
+        working-directory: ./frontend
         run: npm run build
         env:
           DATABASE_URL: postgres://test_user:test_password@localhost:5432/test_db
-          # Dummy values for build phase env vars if needed
           STRIPE_SECRET_KEY: 'sk_test_mock'
