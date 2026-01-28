@@ -5,7 +5,6 @@ services:
     dockerContext: frontend
     dockerfilePath: Dockerfile
     plan: free
-    preDeployCommand: npx prisma migrate deploy
     envVars:
       - key: DATABASE_URL
         fromDatabase:
